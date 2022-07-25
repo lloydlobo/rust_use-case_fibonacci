@@ -42,6 +42,15 @@ pub fn memoized_fib(num: usize) -> usize {
     return result.get_fibo(num);
 }
 
+// https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=5ed66133d8c04c73d382d73a39ee177a
+pub fn main_fibo() {
+    let seed = (0u128, 1u128);
+    let iter = std::iter::successors(Some(seed), |(x, y)| x.checked_add(*y).map(|xy| (*y, xy)));
+
+    for fib in iter.map(|(_, i)| i) {
+        println!("{}", fib);
+    }
+}
 /*
 
 https://codereview.stackexchange.com/a/253969
