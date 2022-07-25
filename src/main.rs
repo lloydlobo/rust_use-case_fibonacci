@@ -61,3 +61,13 @@ help: you can convert an `i64` to a `usize` and panic if the converted value doe
 15 |     let u: usize = n.try_into().unwrap();
 
 */
+
+/*
+https://codereview.stackexchange.com/questions/204555/recursive-fibonacci-in-rust-with-memoization#:~:text=Implement%20a%20generic,with%20a%20Vec%3F
+
+Implement a generic Fibonacci sequence in Rust without using Copy trait => https://codereview.stackexchange.com/q/130042/32521
+How to swap two variables? => https://stackoverflow.com/q/31798737/155423
+How to avoid excessive cloning in Rust? => https://stackoverflow.com/q/40965230/155423
+Is it possible to use a fold with a Vec? => https://stackoverflow.com/q/27760022/155423
+
+*/
