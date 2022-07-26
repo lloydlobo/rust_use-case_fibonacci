@@ -33,3 +33,16 @@ cargo bench -p <package-name>
 ```sh
 cargo watch -x 'bench -p fibonacci'
 ```
+
+## Dependencies
+
+- Benchmark with Criterion
+
+```toml
+[dev-dependencies]
+criterion = "0.3.6"
+
+[[bench]]
+name = "benchmarks"
+harness = false
+```
