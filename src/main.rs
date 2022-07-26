@@ -1,4 +1,5 @@
 #![allow(unused_imports)]
+#![allow(dead_code)]
 use std::{fs::File, io::prelude::*, sync::Once};
 
 /* The I/O Prelude.
@@ -25,21 +26,74 @@ static INIT: Once = Once::new();
 /////////////////////////////////////////////////////////////////////////
 
 fn main() {
-    let res = get_cached_val();
+    // let res = get_cached_val();
+
+    let res = write_output_bytes(40);
     println!("res: {:?}", res);
 }
 
 /////////////////////////////////////////////////////////////////////////
 // HELPER FUNCTIONS
 /////////////////////////////////////////////////////////////////////////
+use std::convert::{TryFrom, TryInto};
 
-pub(crate) fn write_output_bytes() -> std::io::Result<()> {
-    let usize_fibo: usize = fibonacci::memoized_fibonacci(14);
-    let str_fibo = usize_fibo.to_string();
-    let data = str_fibo.as_bytes();
-    // let data: &[u8; 9] = b"fibonacci";
+enum MyType {
+    F32(f32),
+    Str(String),
+    USize(usize),
+}
+
+#[derive()]
+enum TypeCheck {
+    Add,
+    Subtract,
+    USize,
+}
+
+impl TypeCheck {
+    fn run(&self, x: i32, y: i32) -> i32 {
+        match self {
+            Self::Add => x + y,
+            Self::Subtract => x - y,
+            Self::USize => x - y,
+        }
+    }
+}
+// E0599 // This error occurs when a method is used on a type which does not implement it: // In this case, you need to implement the chocolate method to fix the error:
+struct Mouth;
+
+impl Mouth {
+    fn chocolate(&self) {
+        // We implement the `chocolate` method here.
+        println!("Hmmm! I love chocolate!");
+    }
+}
+
+// let x = Mouth;
+// x.chocolate(); // ok!
+// https://doc.rust-lang.org/std/convert/trait.From.html
+// Vec<u8> -> String    String::from_utf8(v)
+// https://stackoverflow.com/questions/41034635/how-do-i-convert-between-string-str-vecu8-and-u8
+
+fn convert_vec_to_str() {
+    let mut s = String::with_capacity(25);
+    println!("{}", s.capacity());
+    for _ in 0..5 {
+        s.push_str("hello");
+        println!("{}", s.capacity());
+    }
+}
+pub(crate) fn write_output_bytes(num: usize) -> std::io::Result<()> {
+    let num_is_usize = num.clone();
+    // usize .. //
+    let usize_fibo: usize = fibonacci::memoized_fibonacci(num_is_usize);
+    // u128 .. //
+
+    let str_fibo: String = usize_fibo.to_string();
+    let bytes: &[u8] = str_fibo.as_bytes();
+    let data: &[u8] = bytes.as_ref();
+
     println!("data: {:?}, usize_fibo: {:?}", data, usize_fibo);
-
     let mut position: usize = 0;
     let mut buffer: File = File::create("output_bytes.txt")?;
 
@@ -49,8 +103,7 @@ pub(crate) fn write_output_bytes() -> std::io::Result<()> {
     }
     Ok(())
 }
-// const WORDS: &'static usize = &"hello rust!".len();
-// let u8_fibo: u8 = usize_fibo.try_into().unwrap(); // let count = WORDS.clone(); // const COUNT: usize = *WORDS; // const WORDS: &str = "hello convenience!"; // let bit_u8_fibo = usize_fibo.to_be_bytes();
+// https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html#lifetime-elision
 
 /* Accessing a `static mut` is unsafe much of the time, but if we do so
 in a synchronized fashion (e.g., write once or read all) then we're
@@ -74,14 +127,12 @@ fn expensive_computation() -> usize {
 
     counter += 1;
     println!("computation: {}, res: {:?}", counter, res); // $ res: Ok(())
-    let res_out = write_output_bytes();
+    let res_out = write_output_bytes(40);
     counter += 1;
     println!("computation: {}, res: {:?}", counter, res_out);
 
     usize_res
 }
-
-// unsafe fn unsafe_fn() {} // extern "C" { //     fn unsafe_extern_fn(); //     static BAR: *mut u32; // } // trait SafeTraitWithUnsafeMethod { //     unsafe fn unsafe_method(&self); // } // struct S; // impl S { //     unsafe fn unsafe_method_on_struct() {} // }
 
 pub(crate) fn loop_fibo_memoize() {
     let mut cache = Vec::new();
@@ -92,4 +143,31 @@ pub(crate) fn loop_fibo_memoize() {
         // println!("result is {:?}", result);
     }
     println!("cache is {:?}", cache);
+}
+
+// fn usize_to_borrowed_u8_bytes(num: usize) -> &[u8] {
+//     // let data: &[u8; 9] = b"fibonacci";
+//     let num_copy: usize = num.clone();
+//     let usize_fibo: usize = fibonacci::memoized_fibonacci(num_copy);
+//     let str_fibo: String = usize_fibo.to_string();
+//     let bytes: &[u8] = str_fibo.as_bytes();
+//     let copy_bytes: &[u8] = bytes.as_ref();
+//     copy_bytes // Lifetime Elision
+// }
+
+// struct ImportantExcerpt<'a> {
+//     part: &'a str, // } // impl<'a> ImportantExcerpt<'a> { //     fn level(&self) -> i32 { //         3 //     } // } // impl<'a> ImportantExcerpt<'a> { //     fn announce_and_return_part(&self, announcement: &str) -> &str { //         println!("Attention please: {}", announcement); //         self.part //     } // } // fn imp_main() { //     let novel = String::from("Call me Ishmael. Some years ago..."); //     let first_sentence = novel.split('.').next().expect("Could not find a '.'"); //     let i = ImportantExcerpt { //         part: first_sentence, //     }; // }
+
+/* Most of the time, an error message suggesting the 'static lifetime results from attempting to create a dangling reference or a mismatch of the available lifetimes.
+In such cases, the solution is fixing those problems, not specifying the 'static lifetime.
+*/
+
+// const WORDS: &'static usize = &"hello rust!".len();
+// let u8_fibo: u8 = usize_fibo.try_into().unwrap(); // let count = WORDS.clone(); // const COUNT: usize = *WORDS; // const WORDS: &str = "hello convenience!"; // let bit_u8_fibo = usize_fibo.to_be_bytes();
+
+// unsafe fn unsafe_fn() {} // extern "C" { //     fn unsafe_extern_fn(); //     static BAR: *mut u32; // } // trait SafeTraitWithUnsafeMethod { //     unsafe fn unsafe_method(&self); // } // struct S; // impl S { //     unsafe fn unsafe_method_on_struct() {} // }
+fn usize_u128() {
+    let size: usize = 42;
+    let good: u128 = u128::try_from(size).unwrap();
+    let double_good: usize = good.try_into().unwrap();
 }

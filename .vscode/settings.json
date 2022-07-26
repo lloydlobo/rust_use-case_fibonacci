@@ -1,4 +1,5 @@
 {
   "autoHide.autoHideSideBar": false,
-  "autoHide.autoHidePanel": false
+  "autoHide.autoHidePanel": false,
+  "cSpell.words": ["rustfmt"]
 }
