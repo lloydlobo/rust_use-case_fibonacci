@@ -6,6 +6,7 @@ pub(crate) use crate::fibonacci::iter_fibonacci::first;
 pub fn fibonacci_sequence(num: usize) {
     fibonacci::memoized_fibonacci(num);
     fibonacci::iter_fibonacci(first());
+    fibonacci::iter_fibonacci_return(first());
 }
 
 pub fn sort_arr<T: Ord>(arr: &mut [T]) {

@@ -65,6 +65,18 @@ pub(crate) fn iter_fibonacci(first: Option<(u128, u128)>) -> () {
     // iterate
 }
 
+pub(crate) fn iter_fibonacci_return(first: Option<(u128, u128)>) -> Vec<(u128, u128)> {
+    let iterate: _ = successors(first, |(x, y)| checked_add_map(x, y));
+
+    /*
+    let powers_of_10 = successors(Some(1_u16), |n| n.checked_mul(10));
+    assert_eq!(powers_of_10.collect::<Vec<_>>(), &[1, 10, 100, 1_000, 10_000]);
+    */
+
+    let res = iterate.collect::<Vec<_>>();
+    res
+}
+
 // https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=5ed66133d8c04c73d382d73a39ee177a
 
 #[cfg(test)]
@@ -96,7 +108,12 @@ mod tests {
     }
 
     #[test]
-    fn test_iter_fibonacci() {
+    fn test_iter_fibonacci_void() {
         assert_eq!(iter_fibonacci(first()), ());
     }
+
+    // #[test]
+    // fn test_iter_fibonacci_return() {
+    //     assert_eq!(iter_fibonacci_return(first()), );
+    // }
 }
