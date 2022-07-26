@@ -1,14 +1,28 @@
-use std::fs::File;
-use std::io::prelude::*;
-use std::sync::Once;
+#![allow(unused_imports)]
+use std::{fs::File, io::prelude::*, sync::Once};
+
+/* The I/O Prelude.
+   The purpose of this module is to alleviate imports of many common I/O traits by adding a glob import to the top of I/O heavy modules:
+*/
+
+/////////////////////////////////////////////////////////////////////////
+//  MODULES
+/////////////////////////////////////////////////////////////////////////
 
 pub(crate) mod fibonacci;
 
 mod write_output_txt;
 
+/////////////////////////////////////////////////////////////////////////
+//  GLOBAL VARIABLES
+/////////////////////////////////////////////////////////////////////////
+
 static mut VAL: usize = 0;
 static INIT: Once = Once::new();
-// static mut ARRAY_COUNTER: Vec<i32> = Vec::new();
+
+/////////////////////////////////////////////////////////////////////////
+// MAIN FUNCTION
+/////////////////////////////////////////////////////////////////////////
 
 fn main() {
     for i in 0..20 {
@@ -20,9 +34,12 @@ fn main() {
             println!("i: {}", i);
         }
     }
-
     loop_fibo_memoize();
 }
+
+/////////////////////////////////////////////////////////////////////////
+// HELPER FUNCTION
+/////////////////////////////////////////////////////////////////////////
 
 pub(crate) fn write_output_bytes() -> std::io::Result<()> {
     let data = b"some output bytes";
@@ -66,20 +83,9 @@ fn expensive_computation() -> usize {
     usize_res
 }
 
-// use std::io::prelude::*;
-// use std::fs::File;
-// fn main() -> std::io::Result<()> {
-//     let data = b"some bytes";
-//     let mut pos = 0;
-//     let mut buffer = File::create("foo.txt")?;
-//     while pos < data.len() {
-//         let bytes_written = buffer.write(&data[pos..])?;
-//         pos += bytes_written;
-//     }
-//     Ok(())
-// }
+// unsafe fn unsafe_fn() {} // extern "C" { //     fn unsafe_extern_fn(); //     static BAR: *mut u32; // } // trait SafeTraitWithUnsafeMethod { //     unsafe fn unsafe_method(&self); // } // struct S; // impl S { //     unsafe fn unsafe_method_on_struct() {} // }
 
-fn loop_fibo_memoize() {
+pub(crate) fn loop_fibo_memoize() {
     let mut cache = Vec::new();
     let mut result;
     for n in 1..100 {
@@ -89,20 +95,3 @@ fn loop_fibo_memoize() {
     }
     println!("cache is {:?}", cache);
 }
-
-// unsafe fn unsafe_fn() {}
-
-// extern "C" {
-//     fn unsafe_extern_fn();
-//     static BAR: *mut u32;
-// }
-
-// trait SafeTraitWithUnsafeMethod {
-//     unsafe fn unsafe_method(&self);
-// }
-
-// struct S;
-
-// impl S {
-//     unsafe fn unsafe_method_on_struct() {}
-// }

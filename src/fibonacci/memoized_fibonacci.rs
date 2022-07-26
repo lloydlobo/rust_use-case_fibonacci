@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+pub(crate) use std::collections::HashMap;
 
 pub(crate) fn memoized_fibonacci(num: usize) -> usize {
     struct Fibo {
