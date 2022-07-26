@@ -25,25 +25,22 @@ static INIT: Once = Once::new();
 /////////////////////////////////////////////////////////////////////////
 
 fn main() {
-    for i in 0..20 {
-        let res = get_cached_val();
-        println!("i: {}, res: {:?}", i, res);
-        if i > 1 {
-            println!(" i: {}", i);
-        } else {
-            println!("i: {}", i);
-        }
-    }
-    loop_fibo_memoize();
+    let res = get_cached_val();
+    println!("res: {:?}", res);
 }
 
 /////////////////////////////////////////////////////////////////////////
-// HELPER FUNCTION
+// HELPER FUNCTIONS
 /////////////////////////////////////////////////////////////////////////
 
 pub(crate) fn write_output_bytes() -> std::io::Result<()> {
-    let data = b"some output bytes";
+    let usize_fibo: usize = fibonacci::memoized_fibonacci(14);
+    // const WORDS: &'static usize = &"hello rust!".len();
+    let str_fibo = usize_fibo.to_string();
+    let data = str_fibo.as_bytes();
+    println!("data: {:?}, usize_fibo: {:?}", data, usize_fibo);
 
+    // let data = b"3";
     let mut position = 0;
     let mut buffer = File::create("output_bytes.txt")?;
 
@@ -53,6 +50,7 @@ pub(crate) fn write_output_bytes() -> std::io::Result<()> {
     }
     Ok(())
 }
+// let u8_fibo: u8 = usize_fibo.try_into().unwrap(); // let count = WORDS.clone(); // const COUNT: usize = *WORDS; // const WORDS: &str = "hello convenience!"; // let bit_u8_fibo = usize_fibo.to_be_bytes();
 
 /* Accessing a `static mut` is unsafe much of the time, but if we do so
 in a synchronized fashion (e.g., write once or read all) then we're
@@ -75,10 +73,10 @@ fn expensive_computation() -> usize {
     let res = write_output_txt::write_output();
 
     counter += 1;
-    println!("expensive_computation #\\{}, res: {:?}", counter, res); // $ res: Ok(())
+    println!("computation: {}, res: {:?}", counter, res); // $ res: Ok(())
     let res_out = write_output_bytes();
     counter += 1;
-    println!("expensive_computation #\\{}, res: {:?}", counter, res_out);
+    println!("computation: {}, res: {:?}", counter, res_out);
 
     usize_res
 }
