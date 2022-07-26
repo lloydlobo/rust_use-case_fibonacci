@@ -60,10 +60,43 @@ pub(crate) fn first() -> Option<(u128, u128)> {
 /// ```
 pub(crate) fn iter_fibonacci(first: Option<(u128, u128)>) -> () {
     let iterate: _ = successors(first, |(x, y)| checked_add_map(x, y));
-
     print_iterate_map(iterate);
 
-    // return iterate;
+    // iterate
 }
 
 // https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=5ed66133d8c04c73d382d73a39ee177a
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_it_works() {
+        assert_eq!(true, true);
+    }
+
+    #[test]
+    fn test_u128_some_unwrap() {
+        // let first_arg_0_1 = first();
+        let num_1: u128 = 0 as u128;
+        let num_2: u128 = 1 as u128;
+        let mock_1 = Some(num_1);
+        let mock_2 = Some(num_2);
+        assert_eq!(Some(num_1), mock_1);
+        assert_eq!(Some(num_2), mock_2);
+        assert_eq!(num_1, mock_1.unwrap());
+        assert_eq!(num_2, mock_2.unwrap());
+    }
+
+    #[test]
+    fn test_first_fn() {
+        let f: Option<(u128, u128)> = first();
+        assert_eq!(f, first())
+    }
+
+    #[test]
+    fn test_iter_fibonacci() {
+        assert_eq!(iter_fibonacci(first()), ());
+    }
+}
