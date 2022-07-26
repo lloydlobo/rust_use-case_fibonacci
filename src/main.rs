@@ -35,21 +35,21 @@ fn main() {
 
 pub(crate) fn write_output_bytes() -> std::io::Result<()> {
     let usize_fibo: usize = fibonacci::memoized_fibonacci(14);
-    // const WORDS: &'static usize = &"hello rust!".len();
     let str_fibo = usize_fibo.to_string();
     let data = str_fibo.as_bytes();
+    // let data: &[u8; 9] = b"fibonacci";
     println!("data: {:?}, usize_fibo: {:?}", data, usize_fibo);
 
-    // let data = b"3";
-    let mut position = 0;
-    let mut buffer = File::create("output_bytes.txt")?;
+    let mut position: usize = 0;
+    let mut buffer: File = File::create("output_bytes.txt")?;
 
     while position < data.len() {
-        let bytes_written = std::io::Write::write(&mut buffer, &data[position..])?;
+        let bytes_written: usize = std::io::Write::write(&mut buffer, &data[position..])?;
         position += bytes_written;
     }
     Ok(())
 }
+// const WORDS: &'static usize = &"hello rust!".len();
 // let u8_fibo: u8 = usize_fibo.try_into().unwrap(); // let count = WORDS.clone(); // const COUNT: usize = *WORDS; // const WORDS: &str = "hello convenience!"; // let bit_u8_fibo = usize_fibo.to_be_bytes();
 
 /* Accessing a `static mut` is unsafe much of the time, but if we do so
