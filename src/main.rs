@@ -3,7 +3,7 @@ use std::collections::HashMap;
 fn main() {
     let mut cache = Vec::new();
     let mut result;
-    for n in 1..4000 {
+    for n in 1..100 {
         result = memoized_fib(n);
         cache.push(result);
         println!("result is {:?}", result);
