@@ -1,73 +1,108 @@
-use std::collections::HashMap;
+use std::fs::File;
+use std::io::prelude::*;
+use std::sync::Once;
+
+pub(crate) mod fibonacci;
+
+mod write_output_txt;
+
+static mut VAL: usize = 0;
+static INIT: Once = Once::new();
+// static mut ARRAY_COUNTER: Vec<i32> = Vec::new();
 
 fn main() {
+    for i in 0..20 {
+        let res = get_cached_val();
+        println!("i: {}, res: {:?}", i, res);
+        if i > 1 {
+            println!(" i: {}", i);
+        } else {
+            println!("i: {}", i);
+        }
+    }
+
+    loop_fibo_memoize();
+}
+
+pub(crate) fn write_output_bytes() -> std::io::Result<()> {
+    let data = b"some output bytes";
+
+    let mut position = 0;
+    let mut buffer = File::create("output_bytes.txt")?;
+
+    while position < data.len() {
+        let bytes_written = std::io::Write::write(&mut buffer, &data[position..])?;
+        position += bytes_written;
+    }
+    Ok(())
+}
+
+/* Accessing a `static mut` is unsafe much of the time, but if we do so
+in a synchronized fashion (e.g., write once or read all) then we're
+good to go!
+This function will only call `expensive_computation` once, and will
+otherwise always return the value returned from the first invocation.
+https://doc.rust-lang.org/std/sync/struct.Once.html
+*/
+fn get_cached_val() -> usize {
+    unsafe {
+        INIT.call_once(|| {
+            VAL = expensive_computation();
+        });
+        VAL
+    }
+}
+fn expensive_computation() -> usize {
+    let mut counter = 0;
+    let usize_res: usize = 0;
+    let res = write_output_txt::write_output();
+
+    counter += 1;
+    println!("expensive_computation #\\{}, res: {:?}", counter, res); // $ res: Ok(())
+    let res_out = write_output_bytes();
+    counter += 1;
+    println!("expensive_computation #\\{}, res: {:?}", counter, res_out);
+
+    usize_res
+}
+
+// use std::io::prelude::*;
+// use std::fs::File;
+// fn main() -> std::io::Result<()> {
+//     let data = b"some bytes";
+//     let mut pos = 0;
+//     let mut buffer = File::create("foo.txt")?;
+//     while pos < data.len() {
+//         let bytes_written = buffer.write(&data[pos..])?;
+//         pos += bytes_written;
+//     }
+//     Ok(())
+// }
+
+fn loop_fibo_memoize() {
     let mut cache = Vec::new();
     let mut result;
     for n in 1..100 {
-        result = memoized_fib(n);
+        result = fibonacci::memoized_fibonacci(n);
         cache.push(result);
-        println!("result is {:?}", result);
+        // println!("result is {:?}", result);
     }
     println!("cache is {:?}", cache);
 }
 
-pub fn memoized_fib(num: usize) -> usize {
-    struct Fibo {
-        memo: HashMap<usize, usize>,
-    }
+// unsafe fn unsafe_fn() {}
 
-    impl Fibo {
-        fn new(num: usize) -> Fibo {
-            return Fibo {
-                memo: HashMap::with_capacity(num),
-            };
-        }
+// extern "C" {
+//     fn unsafe_extern_fn();
+//     static BAR: *mut u32;
+// }
 
-        fn get_fibo(&mut self, num: usize) -> usize {
-            if num <= 2 {
-                return 1;
-            }
+// trait SafeTraitWithUnsafeMethod {
+//     unsafe fn unsafe_method(&self);
+// }
 
-            if !self.memo.contains_key(&num) {
-                let fibo_one = self.get_fibo(num - 1);
-                let fibo_two = self.get_fibo(num - 2);
+// struct S;
 
-                self.memo.entry(num).or_insert(fibo_one + fibo_two);
-            }
-            return *self.memo.get(&num).unwrap();
-        }
-    }
-
-    let mut result = Fibo::new(num);
-    return result.get_fibo(num);
-}
-
-// https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=5ed66133d8c04c73d382d73a39ee177a
-pub fn main_fibo() {
-    let seed = (0u128, 1u128);
-    let iter = std::iter::successors(Some(seed), |(x, y)| x.checked_add(*y).map(|xy| (*y, xy)));
-
-    for fib in iter.map(|(_, i)| i) {
-        println!("{}", fib);
-    }
-}
-/*
-
-https://codereview.stackexchange.com/a/253969
-
-   |
-help: you can convert an `i64` to a `usize` and panic if the converted value doesn't fit
-   |
-15 |     let u: usize = n.try_into().unwrap();
-
-*/
-
-/*
-https://codereview.stackexchange.com/questions/204555/recursive-fibonacci-in-rust-with-memoization#:~:text=Implement%20a%20generic,with%20a%20Vec%3F
-
-Implement a generic Fibonacci sequence in Rust without using Copy trait => https://codereview.stackexchange.com/q/130042/32521
-How to swap two variables? => https://stackoverflow.com/q/31798737/155423
-How to avoid excessive cloning in Rust? => https://stackoverflow.com/q/40965230/155423
-Is it possible to use a fold with a Vec? => https://stackoverflow.com/q/27760022/155423
-
-*/
+// impl S {
+//     unsafe fn unsafe_method_on_struct() {}
+// }

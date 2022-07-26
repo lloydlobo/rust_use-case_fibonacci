@@ -67,14 +67,16 @@ pub(crate) fn iter_fibonacci(first: Option<(u128, u128)>) -> () {
 
 pub(crate) fn iter_fibonacci_return(first: Option<(u128, u128)>) -> Vec<(u128, u128)> {
     let iterate: _ = successors(first, |(x, y)| checked_add_map(x, y));
-
-    /*
-    let powers_of_10 = successors(Some(1_u16), |n| n.checked_mul(10));
-    assert_eq!(powers_of_10.collect::<Vec<_>>(), &[1, 10, 100, 1_000, 10_000]);
-    */
-
+    /* let powers_of_10 = successors(Some(1_u16), |n| n.checked_mul(10)); assert_eq!(powers_of_10.collect::<Vec<_>>(), &[1, 10, 100, 1_000, 10_000]); */
     let res = iterate.collect::<Vec<_>>();
     res
+}
+
+pub(crate) fn main_return() {
+    println!(
+        "iter_fibonacci_return_main: {:?}",
+        iter_fibonacci_return(first())
+    )
 }
 
 // https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=5ed66133d8c04c73d382d73a39ee177a
@@ -112,8 +114,25 @@ mod tests {
         assert_eq!(iter_fibonacci(first()), ());
     }
 
-    // #[test]
-    // fn test_iter_fibonacci_return() {
-    //     assert_eq!(iter_fibonacci_return(first()), );
-    // }
+    #[test]
+    fn test_main_return() {
+        println!("{:?}", main_return());
+        assert_eq!(main_return(), ());
+    }
 }
+
+/*
+// https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=5ed66133d8c04c73d382d73a39ee177a
+pub fn main_fibo() {
+    let seed = (0u128, 1u128);
+    let iter = std::iter::successors(Some(seed), |(x, y)| x.checked_add(*y).map(|xy| (*y, xy)));
+
+    for fib in iter.map(|(_, i)| i) {
+        println!("{}", fib);
+    }
+}
+*/
+
+/* https://codereview.stackexchange.com/a/253969 | help: you can convert an `i64` to a `usize` and panic if the converted value doesn't fit | 15 |     let u: usize = n.try_into().unwrap(); */
+/* https://codereview.stackexchange.com/questions/204555/recursive-fibonacci-in-rust-with-memoization#:~:text=Implement%20a%20generic,with%20a%20Vec%3F
+Implement a generic Fibonacci sequence in Rust without using Copy trait => https://codereview.stackexchange.com/q/130042/32521 How to swap two variables? => https://stackoverflow.com/q/31798737/155423 How to avoid excessive cloning in Rust? => https://stackoverflow.com/q/40965230/155423 Is it possible to use a fold with a Vec? => https://stackoverflow.com/q/27760022/155423 */
