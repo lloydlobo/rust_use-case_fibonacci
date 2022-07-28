@@ -27,15 +27,33 @@ static INIT: Once = Once::new();
 /////////////////////////////////////////////////////////////////////////
 
 fn main() {
-    let mut array_memo_fibo = Vec::new();
+    let res: Vec<u128> = loop_memoize_fibo_arr_push();
+    println!("res: {:?}", res);
+
+    // println!("{:?}", array_memo_fibo);
+    // let res = get_cached_val(); // println!("hello world"); // let res = write_output_bytes(40); // println!("res: {:?}", res);
+}
+
+fn loop_memoize_fibo_arr_push() -> Vec<u128> {
+    #[derive()]
+    struct FiboLoop {
+        memoize: HashMap<Vec<u128>, u128>,
+    }
+
+    impl FiboLoop {
+        fn new(memoize: HashMap<Vec<u128>, u128>) -> Self {
+            Self { memoize }
+        }
+    }
+
+    let mut array_memo_fibo: Vec<u128> = Vec::new();
     for i in 0..100 {
-        // array_memo_fibo.push(memoized_fibonacci(i));
-        for _ in 0..100_000 {
+        for _ in 0..1_000_000 {
             array_memo_fibo.push(memoize_fibo(i));
         }
     }
-    // println!("{:?}", array_memo_fibo);
-    // let res = get_cached_val(); // println!("hello world"); // let res = write_output_bytes(40); // println!("res: {:?}", res);
+
+    array_memo_fibo
 }
 
 pub fn memoize_fibo(num: u128) -> u128 {
