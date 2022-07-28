@@ -1,5 +1,6 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
+use std::collections::HashMap;
 use std::{fs::File, io::prelude::*, sync::Once};
 
 /* The I/O Prelude.
@@ -26,10 +27,102 @@ static INIT: Once = Once::new();
 /////////////////////////////////////////////////////////////////////////
 
 fn main() {
-    // let res = get_cached_val();
+    let mut array_memo_fibo = Vec::new();
+    for i in 0..9 {
+        // array_memo_fibo.push(memoized_fibonacci(i));
+        array_memo_fibo.push(memoize_fibo(i));
+        array_memo_fibo.push(memoize_fibo(i));
+        array_memo_fibo.push(memoize_fibo(i));
+        array_memo_fibo.push(memoize_fibo(i));
+        array_memo_fibo.push(memoize_fibo(i));
+        array_memo_fibo.push(memoize_fibo(i));
+        array_memo_fibo.push(memoize_fibo(i));
+        array_memo_fibo.push(memoize_fibo(i));
+    }
+    println!("{:?}", array_memo_fibo);
+    // let res = get_cached_val(); // println!("hello world"); // let res = write_output_bytes(40); // println!("res: {:?}", res);
+}
 
-    let res = write_output_bytes(40);
-    println!("res: {:?}", res);
+pub fn memoize_fibo(num: u128) -> u128 {
+    #[derive()]
+    struct Fibo {
+        memoize: HashMap<u128, usize>,
+    }
+
+    impl Fibo {
+        pub fn new_hashmap_with_capacity(num: u128) -> Fibo {
+            let num_usize = num.try_into().unwrap();
+
+            return Fibo {
+                memoize: HashMap::with_capacity(num_usize),
+            };
+        }
+        pub fn fibo_prev_cur(&mut self, num: u128) -> (u128, u128) {
+            let fibo_previous: u128 = self.get_fibo_for(num - 2);
+            let fibo_current: u128 = self.get_fibo_for(num - 1);
+
+            (fibo_previous, fibo_current)
+        }
+        /// Find the next fib or Inserts the sum if empty
+        pub fn find_memoize_num_or_insert_sum(&mut self, num: u128, sum: usize) {
+            #[rustfmt::skip]
+            self
+                .memoize
+                .entry(num)
+                .or_insert(sum);
+        }
+
+        pub fn get_fibo_for(&mut self, num: u128) -> u128 {
+            if num <= 2 {
+                return 1;
+            }
+            if !self.memoize.contains_key(&num) {
+                let (prev, cur): (u128, u128) = self.fibo_prev_cur(num);
+                let sum: usize = (prev + cur).try_into().unwrap_or_default();
+
+                self.find_memoize_num_or_insert_sum(num, sum);
+            }
+            let result: u128 = (*Option::unwrap(self.memoize.get(&num)))
+                .try_into()
+                .unwrap_or_default();
+
+            result
+        }
+    }
+
+    Fibo::new_hashmap_with_capacity(num).get_fibo_for(num)
+}
+
+// return (num as u128) + (num as u128);
+/////////////////////////////////////////////////////////////////////////
+// CURRENT FUNCTIONS
+/////////////////////////////////////////////////////////////////////////
+
+pub(crate) fn memoized_fibonacci(num: usize) -> usize {
+    struct Fibo {
+        memo: HashMap<usize, usize>,
+    }
+    impl Fibo {
+        pub fn new(num: usize) -> Fibo {
+            return Fibo {
+                memo: HashMap::with_capacity(num),
+            };
+        }
+        pub fn get_fibo(&mut self, num: usize) -> usize {
+            if num <= 2 {
+                return 1;
+            }
+            if !self.memo.contains_key(&num) {
+                let fibo_one = self.get_fibo(num - 1);
+                let fibo_two = self.get_fibo(num - 2);
+                self.memo.entry(num).or_insert(fibo_one + fibo_two);
+            }
+            return *self.memo.get(&num).unwrap();
+        }
+    }
+
+    let mut result = Fibo::new(num);
+    return result.get_fibo(num);
 }
 
 /////////////////////////////////////////////////////////////////////////
