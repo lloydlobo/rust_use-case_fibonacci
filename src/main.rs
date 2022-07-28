@@ -27,33 +27,42 @@ static INIT: Once = Once::new();
 /////////////////////////////////////////////////////////////////////////
 
 fn main() {
-    let res: Vec<u128> = loop_memoize_fibo_arr_push();
+    let res: Vec<u128> = loop_memoize_fibo_arr_push(20, 1_000);
     println!("res: {:?}", res);
 
     // println!("{:?}", array_memo_fibo);
     // let res = get_cached_val(); // println!("hello world"); // let res = write_output_bytes(40); // println!("res: {:?}", res);
 }
 
-fn loop_memoize_fibo_arr_push() -> Vec<u128> {
+fn loop_memoize_fibo_arr_push(number: u128, capacity: u128) -> Vec<u128> {
     #[derive()]
     struct FiboLoop {
-        memoize: HashMap<Vec<u128>, u128>,
+        memo: HashMap<Vec<u128>, u128>,
     }
 
     impl FiboLoop {
-        fn new(memoize: HashMap<Vec<u128>, u128>) -> Self {
-            Self { memoize }
+        pub fn new(number: u128) -> FiboLoop {
+            let num_usize = number.try_into().unwrap();
+
+            return FiboLoop {
+                memo: HashMap::with_capacity(num_usize),
+            };
+        }
+
+        pub fn loop_push_arr(number: u128, capacity: u128) -> Vec<u128> {
+            let capacity_usize = capacity.try_into().unwrap();
+            let mut array_fibo: Vec<u128> = Vec::with_capacity(capacity_usize);
+
+            for i in 0..number {
+                for _ in 0..capacity {
+                    array_fibo.push(memoize_fibo(i));
+                }
+            }
+            array_fibo
         }
     }
 
-    let mut array_memo_fibo: Vec<u128> = Vec::new();
-    for i in 0..100 {
-        for _ in 0..1_000_000 {
-            array_memo_fibo.push(memoize_fibo(i));
-        }
-    }
-
-    array_memo_fibo
+    FiboLoop::loop_push_arr(number, capacity)
 }
 
 pub fn memoize_fibo(num: u128) -> u128 {
@@ -70,14 +79,12 @@ pub fn memoize_fibo(num: u128) -> u128 {
                 memoize: HashMap::with_capacity(num_usize),
             };
         }
-
         pub fn get_prev_cur_fibo(&mut self, num: u128) -> (u128, u128) {
             let fibo_previous: u128 = self.get_fibo_for(num - 2);
             let fibo_current: u128 = self.get_fibo_for(num - 1);
 
             (fibo_previous, fibo_current)
         }
-
         pub fn get_fibo_for(&mut self, num: u128) -> u128 {
             if num <= 2 {
                 return 1;
