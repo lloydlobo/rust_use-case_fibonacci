@@ -28,25 +28,20 @@ static INIT: Once = Once::new();
 
 fn main() {
     let mut array_memo_fibo = Vec::new();
-    for i in 0..9 {
+    for i in 0..100 {
         // array_memo_fibo.push(memoized_fibonacci(i));
-        array_memo_fibo.push(memoize_fibo(i));
-        array_memo_fibo.push(memoize_fibo(i));
-        array_memo_fibo.push(memoize_fibo(i));
-        array_memo_fibo.push(memoize_fibo(i));
-        array_memo_fibo.push(memoize_fibo(i));
-        array_memo_fibo.push(memoize_fibo(i));
-        array_memo_fibo.push(memoize_fibo(i));
-        array_memo_fibo.push(memoize_fibo(i));
+        for _ in 0..100_000 {
+            array_memo_fibo.push(memoize_fibo(i));
+        }
     }
-    println!("{:?}", array_memo_fibo);
+    // println!("{:?}", array_memo_fibo);
     // let res = get_cached_val(); // println!("hello world"); // let res = write_output_bytes(40); // println!("res: {:?}", res);
 }
 
 pub fn memoize_fibo(num: u128) -> u128 {
     #[derive()]
     struct Fibo {
-        memoize: HashMap<u128, usize>,
+        memoize: HashMap<u128, u128>,
     }
 
     impl Fibo {
@@ -58,7 +53,7 @@ pub fn memoize_fibo(num: u128) -> u128 {
             };
         }
 
-        pub fn fibo_prev_cur(&mut self, num: u128) -> (u128, u128) {
+        pub fn get_prev_cur_fibo(&mut self, num: u128) -> (u128, u128) {
             let fibo_previous: u128 = self.get_fibo_for(num - 2);
             let fibo_current: u128 = self.get_fibo_for(num - 1);
 
@@ -71,14 +66,14 @@ pub fn memoize_fibo(num: u128) -> u128 {
             }
 
             if !self.memoize.contains_key(&num) {
-                let (prev, cur): (u128, u128) = self.fibo_prev_cur(num);
-                let sum: usize = (prev + cur).try_into().unwrap_or_default();
+                let (prev, cur): (u128, u128) = self.get_prev_cur_fibo(num);
+                let sum: u128 = (prev + cur).try_into().unwrap_or_default();
                 // Find the next fib or Inserts the sum if empty
                 self.memoize.entry(num).or_insert(sum);
             }
-            let result: usize = *self.memoize.get(&num).unwrap();
+            let result: u128 = *self.memoize.get(&num).unwrap();
 
-            result.try_into().unwrap_or_default()
+            result
         }
     }
 
