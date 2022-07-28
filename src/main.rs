@@ -57,36 +57,28 @@ pub fn memoize_fibo(num: u128) -> u128 {
                 memoize: HashMap::with_capacity(num_usize),
             };
         }
+
         pub fn fibo_prev_cur(&mut self, num: u128) -> (u128, u128) {
             let fibo_previous: u128 = self.get_fibo_for(num - 2);
             let fibo_current: u128 = self.get_fibo_for(num - 1);
 
             (fibo_previous, fibo_current)
         }
-        /// Find the next fib or Inserts the sum if empty
-        pub fn find_memoize_num_or_insert_sum(&mut self, num: u128, sum: usize) {
-            #[rustfmt::skip]
-            self
-                .memoize
-                .entry(num)
-                .or_insert(sum);
-        }
 
         pub fn get_fibo_for(&mut self, num: u128) -> u128 {
             if num <= 2 {
                 return 1;
             }
+
             if !self.memoize.contains_key(&num) {
                 let (prev, cur): (u128, u128) = self.fibo_prev_cur(num);
                 let sum: usize = (prev + cur).try_into().unwrap_or_default();
-
-                self.find_memoize_num_or_insert_sum(num, sum);
+                // Find the next fib or Inserts the sum if empty
+                self.memoize.entry(num).or_insert(sum);
             }
-            let result: u128 = (*Option::unwrap(self.memoize.get(&num)))
-                .try_into()
-                .unwrap_or_default();
+            let result: usize = *self.memoize.get(&num).unwrap();
 
-            result
+            result.try_into().unwrap_or_default()
         }
     }
 
